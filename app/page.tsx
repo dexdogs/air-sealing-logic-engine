@@ -335,14 +335,23 @@ export default function Home() {
                           </div>
                           <div className="flex items-center gap-2">
                             <input 
-                              type="number" 
-                              step="any"
-                              value={input.value} 
-                              onChange={(e) => handleStrategyInput(s.id, input.key, Number(e.target.value))} 
-                              className="border border-gray-300 p-1.5 rounded w-20 text-black text-xs focus:ring-2 focus:ring-blue-500 outline-none"
-                            />
-                            <span className="text-[10px] text-gray-500 font-medium">{input.unitLabel}</span>
-                          </div>
+                                type="number" 
+                                step="any"
+                                value={input.value} 
+                                onChange={(e) => handleStrategyInput(s.id, input.key, Number(e.target.value))} 
+                                disabled={['tempDiff', 'empiricalRatio', 'tAvg', 'gravity'].includes(input.key) && !unlockedFields[`${s.id}-${input.key}`]}
+                                className={`border p-1.5 rounded w-20 text-black text-xs outline-none ${['tempDiff', 'empiricalRatio', 'tAvg', 'gravity'].includes(input.key) && !unlockedFields[`${s.id}-${input.key}`] ? 'bg-gray-200 cursor-not-allowed text-gray-500' : 'bg-white focus:ring-2 focus:ring-blue-500'}`}
+                              />
+                              {['tempDiff', 'empiricalRatio', 'tAvg', 'gravity'].includes(input.key) && !unlockedFields[`${s.id}-${input.key}`] && (
+                                <button type="button" onClick={() => setUnlockedFields({...unlockedFields, [`${s.id}-${input.key}`]: true})} className="text-[9px] text-blue-600 underline mt-0.5 text-left hover:text-blue-800 block">Edit manually</button>
+                              )}
+                              {['tempDiff', 'empiricalRatio', 'tAvg', 'gravity'].includes(input.key) && unlockedFields[`${s.id}-${input.key}`] && (
+                                <button type="button" onClick={() => {
+                                  const defaultVal = initialStrategies.find(st => st.id === s.id)?.inputs.find(i => i.key === input.key)?.value || 0;
+                                  handleStrategyInput(s.id, input.key, defaultVal);
+                                  setUnlockedFields({...unlockedFields, [`${s.id}-${input.key}`]: false});
+                                }} className="text-[9px] text-blue-600 underline mt-0.5 text-left hover:text-blue-800 block">Restore to default</button>
+                              )}</div>
                         </div>
                       ))}
                     </div>
