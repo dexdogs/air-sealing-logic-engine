@@ -29,7 +29,7 @@ const initialStrategies: StrategyInput[] = [
   { 
     id: "AS-01", name: "Seal box beams to sleepers", type: "Linear",
     inputs: [
-      { key: "length", label: "Sealed length of sill plate in ft", value: 5, unitLabel: "ft", note: "Sealing 5 linear feet of crack at 0.1\" width removes enough leakage to bring C from 3.565 down to X" },
+      { key: "length", label: "Sealed length of sill plate in ft", value: 5, unitLabel: "ft", note: "Sealing linear feet of crack of certain width removes enough leakage" },
       { key: "width", label: "Crack width in inches", value: 0.1, unitLabel: "in", note: "Modeled number. Need actual measurements" }
     ],
     equationName: "Linear Leakage", equationDesc: "(Length in ft x 12) x (Crack width in inches) x (CFM50 per sq inch)",
@@ -81,7 +81,7 @@ const initialStrategies: StrategyInput[] = [
     id: "AS-06", name: "Tape all subfloor seams", type: "OrificeArea",
     inputs: [
       { key: "length", label: "sealed length around the MEP penetration in ft", value: 150, unitLabel: "ft", note: "Modeled number. Need actual measurements" },
-      { key: "width", label: "gap width that is getting sealed", value: 0.069, unitLabel: "in", note: "I assumed 10 sq inch that's a roughly 3\" × 3.3\" opening" }
+      { key: "width", label: "gap width that is getting sealed", value: 0.069, unitLabel: "in", note: "Assuming 10 sq inch that's a roughly 3\" × 3.3\" opening" }
     ],
     equationName: "Orifice Area", equationDesc: "(Sealed length in ft x 12) x (Gap width in inches) x (CFM50 per sq inch)",
     description: "We need to choose the primary pressure plane preventing air entry into floor cavities.",
@@ -91,7 +91,7 @@ const initialStrategies: StrategyInput[] = [
     id: "AS-07", name: "Seal Zip sheathing at bottom", type: "OrificeArea",
     inputs: [
       { key: "length", label: "Projected/Intervention sealed length", value: 10, unitLabel: "ft", note: "Modeled number. Need actual measurements" },
-      { key: "width", label: "gap width that is getting sealed", value: 0.069, unitLabel: "in", note: "I assumed 10 sq inch that's a roughly 3\" × 3.3\" opening" }
+      { key: "width", label: "gap width that is getting sealed", value: 0.069, unitLabel: "in", note: "Assuming 10 sq inch that's a roughly 3\" × 3.3\" opening" }
     ],
     equationName: "Orifice Area", equationDesc: "Same as Linear Leakage",
     description: "Required to connect Zip to foundation sleepers.",
@@ -262,11 +262,11 @@ export default function Home() {
             <thead>
               <tr className="bg-gray-100 border-b">
                 <th className="p-3 w-3/12 font-bold text-gray-700">Strategy & Logic</th>
-                <th className="p-3 w-3/12 font-bold text-gray-700">Inputs</th>
-                <th className="p-3 font-bold text-gray-700">ΔCFM50</th>
-                <th className="p-3 font-bold text-gray-700">% reduced</th>
-                <th className="p-3 font-bold text-blue-800">Proj C (ACH50)</th>
-                <th className="p-3 font-bold text-green-800">Proj I (ACH50)</th>
+                <th className="p-3 w-3/12 font-bold text-gray-700">Strategy-specific Inputs</th>
+                <th className="p-3 font-bold text-gray-700">ΔCFM50 - leakage reduced</th>
+                <th className="p-3 font-bold text-gray-700">% leakage reduced</th>
+                <th className="p-3 font-bold text-blue-800">Projected Unit Compartmentalization (ACH50)</th>
+                <th className="p-3 font-bold text-green-800">Projected Whole-Building Infiltration (ACH50)</th>
               </tr>
             </thead>
             <tbody>
