@@ -78,12 +78,12 @@ const initialStrategies: StrategyInput[] = [
     sourceText: "ES MFNC Field Checklist", sourceUrl: "https://www.energystar.gov/sites/default/files/asset/document/ENERGY%20STAR%20MFNC%20Rater%20Field%20Checklist%20Version%201_1.1_1.2_Rev04.pdf"
   },
   { 
-    id: "AS-06", name: "Tape all subfloor seams", type: "OrificeArea",
+    id: "AS-06", name: "Tape all subfloor seams", type: "Linear",
     inputs: [
       { key: "length", label: "sealed length around the MEP penetration in ft", value: 150, unitLabel: "ft", note: "Modeled number. Need actual measurements" },
       { key: "width", label: "gap width that is getting sealed", value: 0.069, unitLabel: "in", note: "Assuming 10 sq inch that's a roughly 3\" × 3.3\" opening" }
     ],
-    equationName: "Orifice Area", equationDesc: "(Sealed length in ft x 12) x (Gap width in inches) x (CFM50 per sq inch)",
+    equationName: "Linear Leakage", equationDesc: "(Sealed length in ft x 12) x (Gap width in inches) x (CFM50 per sq inch)",
     description: "We need to choose the primary pressure plane preventing air entry into floor cavities.",
     sourceText: "DOE: Air Seal Subfloor Penetrations", sourceUrl: "https://www.energy.gov/sites/default/files/2024-07/13-2_air-seal-large-penetrations-in-subfloor.pdf"
   },
