@@ -4,7 +4,7 @@
 A modular modeling engine designed to quantify the impact of specific air sealing strategies on Unit Compartmentalization ($ACH_{50}$) and Whole-Building Infiltration.
 
 ### Who is this for?
-Built for **Dexdogs** to empower building scientists, modular manufacturers, and HERS raters to transition from anecdotal field measurements to verifiable, data-driven projections.
+Built by **dexdogs** to empower building scientists, modular manufacturers, and HERS raters to transition from anecdotal field measurements to verifiable, data-driven projections.
 
 ### Why is this important?
 This tool standardizes inconsistent field observations. By applying verified physics equations to observable defects, it allows teams to prioritize high-ROI interventions for building performance.
