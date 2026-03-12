@@ -347,9 +347,15 @@ export default function Home() {
                               )}
                               {['tempDiff', 'empiricalRatio', 'tAvg', 'gravity'].includes(input.key) && unlockedFields[`${s.id}-${input.key}`] && (
                                 <button type="button" onClick={() => {
-                                  const defaultVal = initialStrategies.find(st => st.id === s.id)?.inputs.find(i => i.key === input.key)?.value || 0;
+                                  const defaultStrategy = initialStrategies.find(st => st.id === s.id);
+                                  const defaultVal = defaultStrategy?.inputs.find(i => i.key === input.key)?.value || 0;
                                   handleStrategyInput(s.id, input.key, defaultVal);
-                                  setUnlockedFields({...unlockedFields, [`${s.id}-${input.key}`]: false});
+                                  // This line re-freezes the field
+                                  setUnlockedFields(prev => {
+                                    const next = { ...prev };
+                                    delete next[`${s.id}-${input.key}`];
+                                    return next;
+                                  });
                                 }} className="text-[9px] text-blue-600 underline mt-0.5 text-left hover:text-blue-800 block">Restore to default</button>
                               )}</div>
                         </div>
