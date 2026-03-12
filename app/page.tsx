@@ -6,7 +6,7 @@ import { ProjectAssumptions, StrategyInput } from "../types";
 const defaultAssumptions: ProjectAssumptions = {
   unitConditionedVolume: 12360, baselineUnitCompartmentalization: 3.565, baselineC_CFM50: 734.39,
   targetC_ACH50: 1.8, baselineWholeBuildingInfiltration: 1.21, targetI_ACH50: 0.95,
-  ciRatio: 0.339411, airDensity: 0.075, dischargeCoefficient: 0.6, cfm50PerSqInch: 18
+  ciRatio: 0.50, airDensity: 0.075, dischargeCoefficient: 0.6, cfm50PerSqInch: 18
 };
 
 const assumptionLabels: Record<keyof ProjectAssumptions, { label: string; note: string }> = {
@@ -21,6 +21,8 @@ const assumptionLabels: Record<keyof ProjectAssumptions, { label: string; note: 
   dischargeCoefficient: { label: "Discharge Coefficient", note: "Default crack or orifice discharge coefficient (literature)" },
   cfm50PerSqInch: { label: "CFM50 per sq inch of Effective Leakage area", note: "1 sq inch Effective Leakage area = 18 CFM50 (this is a constant, widely used in US building science tools including LBNL's infiltration calculators literature. Sources: Sherman & Grimsrud (1980), ASHRAE Handbook of Fundamentals, Chapter 27, ASTM E779)" }
 };
+
+const lockedAssumptionKeys = ['ciRatio', 'airDensity', 'dischargeCoefficient', 'cfm50PerSqInch'];
 
 const initialStrategies: StrategyInput[] = [
   { 
@@ -151,10 +153,19 @@ export default function Home() {
   const [assumptions, setAssumptions] = useState<ProjectAssumptions>(defaultAssumptions);
   const [strategies, setStrategies] = useState<StrategyInput[]>(initialStrategies);
   const [showPanel, setShowPanel] = useState<boolean>(true);
+  const [unlockedFields, setUnlockedFields] = useState<Record<string, boolean>>({});
   
   // Custom fixed tooltip state to prevent clipping
   const [tooltip, setTooltip] = useState<{show: boolean, text: string, x: number, y: number, isEquation?: boolean, eqName?: string}>({show: false, text: "", x: 0, y: 0});
   
+  const handleAssumptionChange = (key: keyof ProjectAssumptions, value: number) => {
+    let newAssumptions = { ...assumptions, [key]: value };
+    if (key === 'baselineUnitCompartmentalization') newAssumptions.baselineC_CFM50 = Number(((value * newAssumptions.unitConditionedVolume) / 60).toFixed(2));
+    else if (key === 'baselineC_CFM50') newAssumptions.baselineUnitCompartmentalization = Number(((value * 60) / newAssumptions.unitConditionedVolume).toFixed(3));
+    else if (key === 'unitConditionedVolume') newAssumptions.baselineC_CFM50 = Number(((newAssumptions.baselineUnitCompartmentalization * value) / 60).toFixed(2));
+    setAssumptions(newAssumptions);
+  };
+
   const results = calculateImpact(assumptions, strategies);
 
   const handleStrategyInput = (strategyId: string, inputKey: string, value: number) => {
@@ -214,13 +225,9 @@ export default function Home() {
                       i
                     </div>
                   </div>
-                  <input
-                    type="number"
-                    step="any"
-                    value={assumptions[key]}
-                    onChange={(e) => setAssumptions({ ...assumptions, [key]: Number(e.target.value) })}
-                    className="w-full border p-2 rounded text-black bg-white focus:ring-2 focus:ring-blue-500 outline-none text-sm"
-                  />
+                  <input type="number" step="any" value={assumptions[key]} onChange={(e) => handleAssumptionChange(key, Number(e.target.value))} disabled={lockedAssumptionKeys.includes(key) && !unlockedFields[key]} className={`w-full border p-2 rounded text-black text-sm outline-none ${lockedAssumptionKeys.includes(key) && !unlockedFields[key] ? 'bg-gray-200 cursor-not-allowed text-gray-500' : 'bg-white'}`} />
+                  {lockedAssumptionKeys.includes(key) && !unlockedFields[key] && <button type="button" onClick={() => setUnlockedFields({...unlockedFields, [key]: true})} className="text-[10px] text-blue-600 underline mt-1 text-left">Edit manually</button>}
+                  {lockedAssumptionKeys.includes(key) && unlockedFields[key] && <p className="text-[10px] text-amber-600 mt-1 font-bold">⚠️ Default values from literature</p>}
                 </div>
               );
             })}
