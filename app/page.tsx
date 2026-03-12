@@ -183,6 +183,8 @@ export default function Home() {
   };
   const handleMouseLeave = () => setTooltip({ ...tooltip, show: false });
 
+  const results = calculateImpact(assumptions, strategies);
+
   return (
     <main className="flex h-screen w-full overflow-hidden bg-white text-black">
       
