@@ -171,31 +171,92 @@ export default function Home() {
   };
 
   
+  
   const exportToCSV = () => {
-    let csvContent = "data:text/csv;charset=utf-8,";
+    let rows = [];
     
-    csvContent += "PROJECT KEY INPUTS\n";
-    csvContent += "Parameter,Value\n";
-    (Object.keys(assumptions) as Array<keyof ProjectAssumptions>).forEach(key => {
-      csvContent += `"${assumptionLabels[key].label}","${assumptions[key]}"\n`;
+    // 1. Project Key Inputs Section
+    rows.push(["PROJECT KEY INPUTS (Edit values in Column B)"]);
+    rows.push(["Parameter", "Value", "Note"]);
+    
+    const keys = Object.keys(assumptions) as Array<keyof ProjectAssumptions>;
+    keys.forEach((key, i) => {
+      let value: any = assumptions[key];
+      const label = assumptionLabels[key].label;
+      const note = assumptionLabels[key].note;
+      
+      // Add formulas for dependent key inputs (Excel Row index = i + 3)
+      if (key === 'baselineC_CFM50') value = "=(B3*B2)/60";
+      if (key === 'ciRatio') value = "=(B6/B3)";
+      
+      rows.push([`"${label}"`, value, `"${note}"`]);
     });
     
-    csvContent += "\nSTRATEGIES AND RESULTS\n";
-    csvContent += "ID,Strategy Name,Type,Equation,Inputs,CFM50 Removed,% Leakage Reduced,Projected C (ACH50),Projected I (ACH50),Source\n";
+    rows.push([]); // Spacer
+    
+    // 2. Strategies Section
+    rows.push(["STRATEGY MODELING TOOL (Edit inputs in Columns D-I)"]);
+    rows.push([
+      "ID", "Strategy Name", "Type", 
+      "Input 1", "Input 2", "Input 3", "Input 4", "Input 5", "Input 6", 
+      "ΔCFM50 (Leakage Removed)", "% Leakage Reduced", 
+      "Projected Unit Compartmentalization", "Projected Whole-Building Infiltration",
+      "Source"
+    ]);
+
     strategies.forEach((s, index) => {
-      const res = results[index];
-      const inputsStr = s.inputs.map(i => `${i.label}: ${i.value} ${i.unitLabel}`).join(" | ");
-      csvContent += `"${s.id}","${s.name}","${s.type}","${s.equationName}: ${s.equationDesc}","${inputsStr}","${res.cfmRemoved}","${res.cReduced}","${res.projectedC}","${res.projectedI}","${s.sourceText} (${s.sourceUrl})"\n`;
+      const rowIndex = index + 15; // Data starts at Row 15 in Excel
+      const row = [];
+      row.push(s.id);
+      row.push(s.name);
+      row.push(s.type);
+      
+      // Fill Input values (Columns D through I)
+      for (let i = 0; i < 6; i++) {
+        row.push(s.inputs[i] ? s.inputs[i].value : "");
+      }
+
+      // 3. Mathematical Formulas for results
+      let cfmFormula = "0";
+      switch (s.type) {
+        case "Linear":
+          cfmFormula = `=(D${rowIndex}*12)*E${rowIndex}*$B$11`;
+          break;
+        case "Void":
+        case "RimJoist":
+          cfmFormula = `=$B$4*D${rowIndex}`;
+          break;
+        case "Stack":
+          // SQRT((2 * gravity * height * tempDiff) / tAvg)
+          // gravity is Input 6 (I), height is Input 2 (E), tempDiff is Input 3 (F), tAvg is Input 5 (H)
+          // Cd is $B$10, area is Input 1 (D), ratio is Input 4 (G)
+          cfmFormula = `=$B$10*D${rowIndex}*SQRT((2*I${rowIndex}*E${rowIndex}*F${rowIndex})/H${rowIndex})*60*G${rowIndex}`;
+          break;
+        case "DuctBypass":
+          cfmFormula = `=D${rowIndex}*E${rowIndex}*$B$11`;
+          break;
+      }
+      
+      row.push(cfmFormula); // ΔCFM50
+      row.push(`=(J${rowIndex}/$B$4)`); // % Reduced
+      row.push(`=(($B$4-J${rowIndex})*60)/$B$2`); // Proj C
+      row.push(`=L${rowIndex}*$B$8`); // Proj I
+      row.push(`${s.sourceText} (${s.sourceUrl})`);
+      
+      rows.push(row);
     });
 
-    const encodedUri = encodeURI(csvContent);
+    const csvString = rows.map(r => r.join(",")).join("\n");
+    const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "Air_Sealing_Logic_Engine_Export.csv");
+    const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute("download", "Air_Sealing_Model_Tool.csv");
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
   };
+;
 
   const handleMouseEnter = (e: React.MouseEvent, text: string, isEquation = false, eqName = "") => {
     setTooltip({ show: true, text, x: e.clientX, y: e.clientY, isEquation, eqName });
