@@ -11,24 +11,25 @@ const defaultAssumptions: ProjectAssumptions = {
 
 const assumptionLabels: Record<keyof ProjectAssumptions, { label: string; note: string }> = {
   unitConditionedVolume: { label: "Unit Conditioned Volume", note: "Conditioned volume per unit from L x W x H" },
-  baselineUnitCompartmentalization: { label: "Baseline Unit Compartmentalization (ACH50)", note: "Starting unit compartmentalization from HERS model or initial Blower Door test" },
+  baselineUnitCompartmentalization: { label: "Baseline Unit Compartmentalization (ACH50)", note: "Starting unit compartmentalization" },
   baselineC_CFM50: { label: "Baseline Unit Compartmentalization (CFM50)", note: "Starting unit compartmentalization in CFM50" },
-  targetC_ACH50: { label: "Target Unit Compartmentalization (ACH50)", note: "Design target for unit compartmentalization from HERS model or code limit" },
-  baselineWholeBuildingInfiltration: { label: "Baseline Whole-Building Infiltration (ACH50)", note: "Starting whole-building infiltration or initial Blower Door test" },
-  targetI_ACH50: { label: "Target Whole-Building Infiltration (ACH50)", note: "Design target for whole-building infiltration from HERS model or code limit" },
+  targetC_ACH50: { label: "Target Unit Compartmentalization (ACH50)", note: "Design target for unit compartmentalization" },
+  baselineWholeBuildingInfiltration: { label: "Baseline Whole-Building Infiltration (ACH50)", note: "Starting whole-building infiltration" },
+  targetI_ACH50: { label: "Target Whole-Building Infiltration (ACH50)", note: "Design target for whole-building infiltration" },
   ciRatio: { label: "Unit Compartmentalization : Whole-Building Infiltration Ratio", note: "Infiltration as fraction of Compartmentalization, derived from baseline values (building science assumes 50/50)" },
   airDensity: { label: "Air Density", note: "Standard air density at sea level (standard)" },
   dischargeCoefficient: { label: "Discharge Coefficient", note: "Default crack or orifice discharge coefficient (literature)" },
-  cfm50PerSqInch: { label: "CFM50 per sq inch of Effective Leakage area", note: "1 sq inch Effective Leakage area = 18 CFM50 (this is a constant, widely used in US building science tools including LBNL's infiltration calculators literature. Sources: Sherman & Grimsrud (1980), ASHRAE Handbook of Fundamentals, Chapter 27, ASTM E779)" }
+  cfm50PerSqInch: { label: "CFM50 per sq inch of Effective Leakage area", note: "1 sq inch Effective Leakage area = 18 CFM50. Sources: Sherman & Grimsrud (1980), ASHRAE Handbook of Fundamentals, Chapter 27, ASTM E779" }
 };
 
 const lockedAssumptionKeys = ['targetI_ACH50', 'ciRatio', 'airDensity', 'dischargeCoefficient', 'cfm50PerSqInch'];
+const as03LockedKeys = ['tempDiff', 'empiricalRatio', 'tAvg', 'gravity'];
 
 const initialStrategies: StrategyInput[] = [
   { 
     id: "AS-01", name: "Seal box beams to sleepers", type: "Linear",
     inputs: [
-      { key: "length", label: "Sealed length of sill plate in ft", value: 5, unitLabel: "ft", note: "Represents the effective unsealed crack length so I am assuming only a small fraction of the sill plate perimeter has actual unsealed gaps large enough to matter. Assuming that most of the perimeter may already be reasonably tight from construction and only a few feet have meaningful crack width. Iow sealing 5 linear feet of crack at 0.1\" width removes enough leakage to bring C from 3.565 down to X" },
+      { key: "length", label: "Sealed length of sill plate in ft", value: 5, unitLabel: "ft", note: "Sealing 5 linear feet of crack at 0.1\" width removes enough leakage to bring C from 3.565 down to X" },
       { key: "width", label: "Crack width in inches", value: 0.1, unitLabel: "in", note: "Modeled number. Need actual measurements" }
     ],
     equationName: "Linear Leakage", equationDesc: "(Length in ft x 12) x (Crack width in inches) x (CFM50 per sq inch)",
@@ -46,10 +47,10 @@ const initialStrategies: StrategyInput[] = [
     id: "AS-03", name: "Seal mechanical chases", type: "Stack",
     inputs: [
       { key: "area", label: "chase cross-section area of the unsealed gap/crack", value: 0.069, unitLabel: "sq ft", note: "I assumed 10 sq inch that's a roughly 3\" × 3.3\" opening" },
-      { key: "height", label: "floor height driving the stack", value: 9, unitLabel: "ft", note: "This is post intervention effective height that is sealing chases at top and bottom of every floor level (isolate each floor)" },
+      { key: "height", label: "floor height driving the stack", value: 9, unitLabel: "ft", note: "Post intervention effective height sealing chases at top and bottom of every floor" },
       { key: "tempDiff", label: "temperature difference between inside and outside", value: 30, unitLabel: "F", note: "Constant" },
       { key: "empiricalRatio", label: "CFM50 per CFM natural empirical ratio", value: 20, unitLabel: "ratio", note: "Constant specific to stack-driven leakage in multifamily buildings" },
-      { key: "tAvg", label: "T_avg", value: 527, unitLabel: "R", note: "average absolute temperature in Rankline" },
+      { key: "tAvg", label: "T_avg", value: 527, unitLabel: "R", note: "Average absolute temperature in Rankline" },
       { key: "gravity", label: "gravitational acceleration in ft per sq sec", value: 32.2, unitLabel: "ft/s²", note: "Constant" }
     ],
     equationName: "Stack Effect", equationDesc: "(Cd) x (Area in sq ft) x (Buoyancy velocity) x 60 x 20",
@@ -110,7 +111,7 @@ const initialStrategies: StrategyInput[] = [
     id: "AS-09", name: "Sealant at rim joist perimeter", type: "RimJoist",
     inputs: [
       { key: "length", label: "Projected/Intervention sealed length", value: 10, unitLabel: "ft", note: "Modeled number. Need actual measurements" },
-      { key: "fraction", label: "fraction of total envelope leakage attributable to rim joist", value: 0.15, unitLabel: "fraction", note: "This means 15% of total baseline envelope leakage comes from the rim joist at Gilman. From literature, BSC cites 15–25% as a typical range for rim joist contribution across residential buildings" }
+      { key: "fraction", label: "fraction of total envelope leakage attributable to rim joist", value: 0.15, unitLabel: "fraction", note: "BSC cites 15–25% as a typical range for rim joist contribution" }
     ],
     equationName: "Rim Joist %", equationDesc: "(Total baseline leakage flow at 50Pa) x (Fraction attributable to rim joist)",
     description: "Rim joists typically account for 15-25% of total envelope infiltration.",
@@ -135,7 +136,7 @@ const initialStrategies: StrategyInput[] = [
   },
   { 
     id: "AS-12", name: "Seal rim joist before Zip", type: "RimJoist",
-    inputs: [{ key: "fraction", label: "fraction of total envelope leakage attributable to rim joist", value: 0.15, unitLabel: "fraction", note: "This means 15% of total baseline envelope leakage comes from the rim joist at Gilman. From literature, BSC cites 15–25% as a typical range for rim joist contribution across residential buildings" }],
+    inputs: [{ key: "fraction", label: "fraction of total envelope leakage attributable to rim joist", value: 0.15, unitLabel: "fraction", note: "BSC cites 15–25% as a typical range for rim joist contribution" }],
     equationName: "Rim Joist %", equationDesc: "Same as AS-09",
     description: "Pre-sheathing ensures continuity in field or factory.",
     sourceText: "Siplast: Air Barrier Transitions", sourceUrl: "https://www.siplast.com/blog/building-enclosure/what-architects-should-know-about-air-barrier-transitions-281474980418303"
@@ -154,10 +155,15 @@ export default function Home() {
   const [strategies, setStrategies] = useState<StrategyInput[]>(initialStrategies);
   const [showPanel, setShowPanel] = useState<boolean>(true);
   const [unlockedFields, setUnlockedFields] = useState<Record<string, boolean>>({});
-    
-  // Custom fixed tooltip state to prevent clipping
   const [tooltip, setTooltip] = useState<{show: boolean, text: string, x: number, y: number, isEquation?: boolean, eqName?: string}>({show: false, text: "", x: 0, y: 0});
-  
+
+  const handleStrategyInput = (strategyId: string, inputKey: string, value: number) => {
+    setStrategies(strategies.map(s => {
+      if (s.id !== strategyId) return s;
+      return { ...s, inputs: s.inputs.map(i => i.key === inputKey ? { ...i, value } : i) };
+    }));
+  };
+
   const handleAssumptionChange = (key: keyof ProjectAssumptions, value: number) => {
     let newAssumptions = { ...assumptions, [key]: value };
     if (key === 'baselineUnitCompartmentalization') newAssumptions.baselineC_CFM50 = Number(((value * newAssumptions.unitConditionedVolume) / 60).toFixed(2));
@@ -166,30 +172,18 @@ export default function Home() {
     else if (key === 'targetC_ACH50') newAssumptions.targetI_ACH50 = Number((value * newAssumptions.ciRatio).toFixed(2));
     else if (key === 'ciRatio') newAssumptions.targetI_ACH50 = Number((newAssumptions.targetC_ACH50 * value).toFixed(2));
     else if (key === 'targetI_ACH50') newAssumptions.ciRatio = Number((value / newAssumptions.targetC_ACH50).toFixed(4));
-    
     setAssumptions(newAssumptions);
   };
 
-  
-  
-  
   const exportToCSV = () => {
-    let csvContent = "data:text/csv;charset=utf-8,";
-    
-    csvContent += "PROJECT KEY INPUTS\n";
-    csvContent += "Parameter,Value\n";
+    let csvContent = "data:text/csv;charset=utf-8,Parameter,Value\n";
     (Object.keys(assumptions) as Array<keyof ProjectAssumptions>).forEach(key => {
       csvContent += `"${assumptionLabels[key].label}","${assumptions[key]}"\n`;
     });
-    
-    csvContent += "\nSTRATEGIES AND RESULTS\n";
-    csvContent += "ID,Strategy Name,Type,Equation,Inputs,CFM50 Removed,% Leakage Reduced,Projected C (ACH50),Projected I (ACH50),Source\n";
-    strategies.forEach((s, index) => {
-      const res = results[index];
-      const inputsStr = s.inputs.map(i => `${i.label}: ${i.value} ${i.unitLabel}`).join(" | ");
-      csvContent += `"${s.id}","${s.name}","${s.type}","${s.equationName}: ${s.equationDesc}","${inputsStr}","${res.cfmRemoved}","${res.cReduced}","${res.projectedC}","${res.projectedI}","${s.sourceText} (\n${s.sourceUrl})"` + "\n";
+    csvContent += "\nID,Strategy,ΔCFM50,% Reduced,Proj C,Proj I\n";
+    results.forEach(r => {
+      csvContent += `"${r.id}","${r.name}","${r.cfmRemoved}","${r.cReduced}","${r.projectedC}","${r.projectedI}"\n`;
     });
-
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
@@ -198,8 +192,6 @@ export default function Home() {
     link.click();
     document.body.removeChild(link);
   };
-;
-;
 
   const handleMouseEnter = (e: React.MouseEvent, text: string, isEquation = false, eqName = "") => {
     setTooltip({ show: true, text, x: e.clientX, y: e.clientY, isEquation, eqName });
@@ -210,50 +202,35 @@ export default function Home() {
 
   return (
     <main className="flex h-screen w-full overflow-hidden bg-white text-black">
-      
-      {/* Global Tooltip Portal */}
       {tooltip.show && (
-        <div 
-          className="fixed bg-gray-900 text-white text-xs p-3 rounded-md z-[9999] w-72 shadow-2xl pointer-events-none"
-          style={{ top: Math.min(tooltip.y + 15, window.innerHeight - 100), left: Math.min(tooltip.x + 15, window.innerWidth - 300) }}
-        >
+        <div className="fixed bg-gray-900 text-white text-xs p-3 rounded-md z-[9999] w-72 shadow-2xl pointer-events-none"
+             style={{ top: Math.min(tooltip.y + 15, window.innerHeight - 100), left: Math.min(tooltip.x + 15, window.innerWidth - 300) }}>
           {tooltip.isEquation && <p className="font-bold mb-1 text-blue-300">{tooltip.eqName}</p>}
           <p>{tooltip.text}</p>
         </div>
       )}
 
-      {/* Left Panel: Independently Scrollable */}
-      <div className={`flex flex-col h-full bg-gray-50 border-r border-gray-200 transition-all duration-300 ease-in-out z-40 ${showPanel ? "w-[350px] min-w-[350px]" : "w-16 min-w-16"}`}>
-        <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-white">
-          {showPanel && <h2 className="text-lg font-bold whitespace-nowrap overflow-hidden text-gray-800">Key Inputs</h2>}
-          <button 
-            onClick={() => setShowPanel(!showPanel)} 
-            className="p-1 rounded-md hover:bg-gray-200 text-gray-700 focus:outline-none transition-colors"
-            title="Toggle Panel"
-          >
+      <div className={`flex flex-col h-full bg-gray-50 border-r border-gray-200 transition-all duration-300 z-40 ${showPanel ? "w-[350px] min-w-[350px]" : "w-16 min-w-16"}`}>
+        <div className="flex items-center justify-between p-4 border-b bg-white">
+          {showPanel && <h2 className="text-lg font-bold text-gray-800">Key Inputs</h2>}
+          <button onClick={() => setShowPanel(!showPanel)} className="p-1 rounded hover:bg-gray-200 text-gray-700">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
           </button>
         </div>
-        
         {showPanel && (
-          <div className="p-4 overflow-y-auto flex-1">
+          <div className="p-4 overflow-y-auto flex-1 pb-24">
             {(Object.keys(assumptions) as Array<keyof ProjectAssumptions>).map((key) => {
               const labelInfo = assumptionLabels[key];
+              const isLocked = lockedAssumptionKeys.includes(key) && !unlockedFields[key];
               return (
                 <div key={key} className="mb-5">
                   <div className="flex items-start gap-1 mb-1">
-                    <label className="text-xs font-semibold text-gray-700 leading-tight flex-1">
-                      {labelInfo.label}
-                    </label>
-                    <div 
-                      className="cursor-help inline-flex items-center justify-center w-4 h-4 rounded-full bg-blue-100 text-blue-600 text-[10px] font-bold flex-shrink-0"
-                      onMouseEnter={(e) => handleMouseEnter(e, labelInfo.note)}
-                      onMouseLeave={handleMouseLeave}
-                    >
-                      i
-                    </div>
+                    <label className="text-xs font-semibold text-gray-700 leading-tight flex-1">{labelInfo.label}</label>
+                    <div className="cursor-help inline-flex items-center justify-center w-4 h-4 rounded-full bg-blue-100 text-blue-600 text-[10px] font-bold flex-shrink-0"
+                         onMouseEnter={(e) => handleMouseEnter(e, labelInfo.note)} onMouseLeave={handleMouseLeave}>i</div>
                   </div>
-                  <input type="number" step="any" value={assumptions[key]} onChange={(e) => handleAssumptionChange(key, Number(e.target.value))} disabled={lockedAssumptionKeys.includes(key) && !unlockedFields[key]} className={`w-full border p-2 rounded text-black text-sm outline-none ${lockedAssumptionKeys.includes(key) && !unlockedFields[key] ? 'bg-gray-200 cursor-not-allowed text-gray-500' : 'bg-white focus:ring-2 focus:ring-blue-500'}`} />
+                  <input type="number" step="any" value={assumptions[key]} onChange={(e) => handleAssumptionChange(key, Number(e.target.value))} disabled={isLocked}
+                         className={`w-full border p-2 rounded text-black text-sm outline-none ${isLocked ? 'bg-gray-200 cursor-not-allowed text-gray-500' : 'bg-white focus:ring-2 focus:ring-blue-500'}`} />
                   {lockedAssumptionKeys.includes(key) && !unlockedFields[key] && (
                     <button type="button" onClick={() => setUnlockedFields({...unlockedFields, [key]: true})} className="text-[10px] text-blue-600 underline mt-1 text-left hover:text-blue-800 block">Edit manually</button>
                   )}
@@ -265,59 +242,45 @@ export default function Home() {
                         let newCi = key === 'targetI_ACH50' ? Number((defaultVal / assumptions.targetC_ACH50).toFixed(4)) : assumptions.ciRatio;
                         setAssumptions({...assumptions, [key]: defaultVal, ciRatio: newCi}); 
                         setUnlockedFields({...unlockedFields, [key]: false}); 
-                      }} className="text-[10px] text-blue-600 underline text-left hover:text-blue-800 block">
-                        Restore to default
-                      </button>
+                      }} className="text-[10px] text-blue-600 underline text-left hover:text-blue-800 block">Restore to default</button>
                     </div>
                   )}
-                  </div>
+                </div>
               );
             })}
           </div>
         )}
       </div>
 
-      {/* Right Panel: Independently Scrollable Viewport */}
       <div className="flex-1 h-full overflow-y-auto bg-white p-6 md:p-8">
-        <div className="mb-8 max-w-[1400px] flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+        <div className="mb-8 max-w-[1400px] flex justify-between items-center">
           <h1 className="text-3xl font-bold text-gray-900">Air Sealing Logic Engine</h1>
-          <button onClick={exportToCSV} className="bg-green-600 text-white px-4 py-2 rounded-md shadow-md hover:bg-green-700 transition-colors text-sm font-bold flex items-center gap-2 w-fit">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-            Export to CSV
-          </button>
+          <button onClick={exportToCSV} className="bg-green-600 text-white px-4 py-2 rounded shadow hover:bg-green-700 transition font-bold text-sm">Export to CSV</button>
         </div>
-        
         <div className="overflow-x-auto pb-32 max-w-[1400px]">
           <table className="w-full text-left border-collapse text-sm">
             <thead>
-              <tr className="bg-gray-100 border-b border-gray-200">
+              <tr className="bg-gray-100 border-b">
                 <th className="p-3 w-3/12 font-bold text-gray-700">Strategy & Logic</th>
                 <th className="p-3 w-3/12 font-bold text-gray-700">Inputs</th>
-                <th className="p-3 font-bold text-gray-700">ΔCFM50 - Leakage Removed</th>
-                <th className="p-3 font-bold text-gray-700">% leakage reduced</th>
-                <th className="p-3 font-bold text-blue-800">Projected Unit Compartmentalization</th>
-                <th className="p-3 font-bold text-green-800">Projected Whole-Building Infiltration</th>
+                <th className="p-3 font-bold text-gray-700">ΔCFM50</th>
+                <th className="p-3 font-bold text-gray-700">% reduced</th>
+                <th className="p-3 font-bold text-blue-800">Proj C (ACH50)</th>
+                <th className="p-3 font-bold text-green-800">Proj I (ACH50)</th>
               </tr>
             </thead>
             <tbody>
               {strategies.map((s, index) => (
-                <tr key={s.id} className="border-b border-gray-100 hover:bg-gray-50 align-top transition-colors">
+                <tr key={s.id} className="border-b hover:bg-gray-50 align-top transition-colors">
                   <td className="p-3">
                     <div className="flex items-center gap-2 mb-1">
                       <span className="font-bold text-gray-900">{s.id}</span>
-                      <div 
-                        className="cursor-help inline-flex items-center justify-center w-5 h-5 rounded-full bg-blue-100 text-blue-600 text-xs font-bold"
-                        onMouseEnter={(e) => handleMouseEnter(e, s.equationDesc, true, s.equationName)}
-                        onMouseLeave={handleMouseLeave}
-                      >
-                        i
-                      </div>
+                      <div className="cursor-help inline-flex items-center justify-center w-5 h-5 rounded-full bg-blue-100 text-blue-600 text-xs font-bold"
+                           onMouseEnter={(e) => handleMouseEnter(e, s.equationDesc, true, s.equationName)} onMouseLeave={handleMouseLeave}>i</div>
                     </div>
                     <p className="font-semibold text-gray-800 mb-1">{s.name}</p>
                     <p className="text-[10px] leading-snug text-gray-500 mb-2">{s.description}</p>
-                    <a href={s.sourceUrl} target="_blank" rel="noopener noreferrer" className="text-[10px] text-blue-600 hover:underline block truncate max-w-[200px]">
-                      Source: {s.sourceText}
-                    </a>
+                    <a href={s.sourceUrl} target="_blank" className="text-[10px] text-blue-600 hover:underline block truncate max-w-[200px]">Source: {s.sourceText}</a>
                   </td>
                   <td className="p-3">
                     <div className="flex flex-col gap-3">
@@ -325,39 +288,26 @@ export default function Home() {
                         <div key={input.key} className="flex flex-col gap-1">
                           <div className="flex items-start gap-1">
                             <label className="text-[10px] font-semibold text-gray-600 leading-tight flex-1">{input.label}</label>
-                            <div 
-                              className="cursor-help inline-flex items-center justify-center w-3 h-3 rounded-full bg-gray-200 text-gray-600 text-[8px] font-bold flex-shrink-0"
-                              onMouseEnter={(e) => handleMouseEnter(e, input.note)}
-                              onMouseLeave={handleMouseLeave}
-                            >
-                              i
-                            </div>
+                            <div className="cursor-help inline-flex items-center justify-center w-3 h-3 rounded-full bg-gray-200 text-gray-600 text-[8px] font-bold"
+                                 onMouseEnter={(e) => handleMouseEnter(e, input.note)} onMouseLeave={handleMouseLeave}>i</div>
                           </div>
                           <div className="flex items-center gap-2">
-                            <input 
-                                type="number" 
-                                step="any"
-                                value={input.value} 
-                                onChange={(e) => handleStrategyInput(s.id, input.key, Number(e.target.value))} 
-                                disabled={['tempDiff', 'empiricalRatio', 'tAvg', 'gravity'].includes(input.key) && !unlockedFields[`${s.id}-${input.key}`]}
-                                className={`border p-1.5 rounded w-20 text-black text-xs outline-none ${['tempDiff', 'empiricalRatio', 'tAvg', 'gravity'].includes(input.key) && !unlockedFields[`${s.id}-${input.key}`] ? 'bg-gray-200 cursor-not-allowed text-gray-500' : 'bg-white focus:ring-2 focus:ring-blue-500'}`}
-                              />
-                              {['tempDiff', 'empiricalRatio', 'tAvg', 'gravity'].includes(input.key) && !unlockedFields[`${s.id}-${input.key}`] && (
-                                <button type="button" onClick={() => setUnlockedFields({...unlockedFields, [`${s.id}-${input.key}`]: true})} className="text-[9px] text-blue-600 underline mt-0.5 text-left hover:text-blue-800 block">Edit manually</button>
-                              )}
-                              {['tempDiff', 'empiricalRatio', 'tAvg', 'gravity'].includes(input.key) && unlockedFields[`${s.id}-${input.key}`] && (
-                                <button type="button" onClick={() => {
-                                  const defaultStrategy = initialStrategies.find(st => st.id === s.id);
-                                  const defaultVal = defaultStrategy?.inputs.find(i => i.key === input.key)?.value || 0;
-                                  handleStrategyInput(s.id, input.key, defaultVal);
-                                  // This line re-freezes the field
-                                  setUnlockedFields(prev => {
-                                    const next = { ...prev };
-                                    delete next[`${s.id}-${input.key}`];
-                                    return next;
-                                  });
-                                }} className="text-[9px] text-blue-600 underline mt-0.5 text-left hover:text-blue-800 block">Restore to default</button>
-                              )}</div>
+                            <input type="number" step="any" value={input.value} 
+                                   onChange={(e) => handleStrategyInput(s.id, input.key, Number(e.target.value))} 
+                                   disabled={as03LockedKeys.includes(input.key) && !unlockedFields[`${s.id}-${input.key}`]}
+                                   className={`border p-1.5 rounded w-20 text-black text-xs outline-none ${as03LockedKeys.includes(input.key) && !unlockedFields[`${s.id}-${input.key}`] ? 'bg-gray-200 cursor-not-allowed text-gray-500' : 'bg-white focus:ring-2 focus:ring-blue-500'}`} />
+                            <span className="text-[10px] text-gray-500 font-medium">{input.unitLabel}</span>
+                          </div>
+                          {as03LockedKeys.includes(input.key) && !unlockedFields[`${s.id}-${input.key}`] && (
+                            <button type="button" onClick={() => setUnlockedFields({...unlockedFields, [`${s.id}-${input.key}`]: true})} className="text-[9px] text-blue-600 underline text-left block">Edit manually</button>
+                          )}
+                          {as03LockedKeys.includes(input.key) && unlockedFields[`${s.id}-${input.key}`] && (
+                            <button type="button" onClick={() => {
+                              const defaultVal = initialStrategies.find(st => st.id === s.id)?.inputs.find(i => i.key === input.key)?.value || 0;
+                              handleStrategyInput(s.id, input.key, defaultVal);
+                              setUnlockedFields(prev => { const next = { ...prev }; delete next[`${s.id}-${input.key}`]; return next; });
+                            }} className="text-[9px] text-blue-600 underline text-left block">Restore to default</button>
+                          )}
                         </div>
                       ))}
                     </div>
@@ -372,6 +322,11 @@ export default function Home() {
           </table>
         </div>
       </div>
-    <footer className="fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 text-center py-2 text-black text-xs z-[100] flex flex-col md:flex-row justify-center items-center gap-2 md:gap-4 shadow-lg"><span className="font-bold">dexdogs // environment has a data problem</span><span>Solving the environmental data problem by standardizing field science. This tool is open for iterative feedback.</span><a href="mailto:ankur@dexdogs.earth" className="underline font-bold hover:text-gray-600">Send Feedback to ankur@dexdogs.earth</a></footer></main>
+      <footer className="fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 text-center py-2 text-black text-xs z-[100] flex flex-col md:flex-row justify-center items-center gap-2 md:gap-4 shadow-lg">
+        <span className="font-bold text-black">dexdogs // environment has a data problem</span>
+        <span>Solving the environmental data problem by standardizing field science. This tool is open for iterative feedback.</span>
+        <a href="mailto:ankur@dexdogs.earth" className="underline font-bold hover:text-gray-600">Send Feedback to ankur@dexdogs.earth</a>
+      </footer>
+    </main>
   );
 }
