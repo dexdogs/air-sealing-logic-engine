@@ -270,54 +270,63 @@ export default function Home() {
               </tr>
             </thead>
             <tbody>
-              {strategies.map((s, index) => (
-                <tr key={s.id} className="border-b hover:bg-gray-50 align-top transition-colors">
-                  <td className="p-3">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="font-bold text-gray-900">{s.id}</span>
-                      <div className="cursor-help inline-flex items-center justify-center w-5 h-5 rounded-full bg-blue-100 text-blue-600 text-xs font-bold"
-                           onMouseEnter={(e) => handleMouseEnter(e, s.equationDesc, true, s.equationName)} onMouseLeave={handleMouseLeave}>i</div>
-                    </div>
-                    <p className="font-semibold text-gray-800 mb-1">{s.name}</p>
-                    <p className="text-[10px] leading-snug text-gray-500 mb-2">{s.description}</p>
-                    <a href={s.sourceUrl} target="_blank" className="text-[10px] text-blue-600 hover:underline block truncate max-w-[200px]">Source: {s.sourceText}</a>
-                  </td>
-                  <td className="p-3">
-                    <div className="flex flex-col gap-3">
-                      {s.inputs.map(input => (
-                        <div key={input.key} className="flex flex-col gap-1">
-                          <div className="flex items-start gap-1">
-                            <label className="text-[10px] font-semibold text-gray-600 leading-tight flex-1">{input.label}</label>
-                            <div className="cursor-help inline-flex items-center justify-center w-3 h-3 rounded-full bg-gray-200 text-gray-600 text-[8px] font-bold"
-                                 onMouseEnter={(e) => handleMouseEnter(e, input.note)} onMouseLeave={handleMouseLeave}>i</div>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <input type="number" step="any" value={input.value} 
-                                   onChange={(e) => handleStrategyInput(s.id, input.key, Number(e.target.value))} 
-                                   disabled={as03LockedKeys.includes(input.key) && !unlockedFields[`${s.id}-${input.key}`]}
-                                   className={`border p-1.5 rounded w-20 text-black text-xs outline-none ${as03LockedKeys.includes(input.key) && !unlockedFields[`${s.id}-${input.key}`] ? 'bg-gray-200 cursor-not-allowed text-gray-500' : 'bg-white focus:ring-2 focus:ring-blue-500'}`} />
-                            <span className="text-[10px] text-gray-500 font-medium">{input.unitLabel}</span>
-                          </div>
-                          {as03LockedKeys.includes(input.key) && !unlockedFields[`${s.id}-${input.key}`] && (
-                            <button type="button" onClick={() => setUnlockedFields({...unlockedFields, [`${s.id}-${input.key}`]: true})} className="text-[9px] text-blue-600 underline text-left block">Edit manually</button>
-                          )}
-                          {as03LockedKeys.includes(input.key) && unlockedFields[`${s.id}-${input.key}`] && (
-                            <button type="button" onClick={() => {
-                              const defaultVal = initialStrategies.find(st => st.id === s.id)?.inputs.find(i => i.key === input.key)?.value || 0;
-                              handleStrategyInput(s.id, input.key, defaultVal);
-                              setUnlockedFields(prev => { const next = { ...prev }; delete next[`${s.id}-${input.key}`]; return next; });
-                            }} className="text-[9px] text-blue-600 underline text-left block">Restore to default</button>
-                          )}
+              {strategies.map((s, index) => {
+                const isComingSoon = ['AS-11', 'AS-13'].includes(s.id);
+                return (
+                  <tr key={s.id} className="border-b hover:bg-gray-50 align-top transition-colors">
+                    <td className="p-3">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="font-bold text-gray-900">{s.id}</span>
+                        {!isComingSoon && (
+                          <div className="cursor-help inline-flex items-center justify-center w-5 h-5 rounded-full bg-blue-100 text-blue-600 text-xs font-bold"
+                               onMouseEnter={(e) => handleMouseEnter(e, s.equationDesc, true, s.equationName)} onMouseLeave={handleMouseLeave}>i</div>
+                        )}
+                      </div>
+                      <p className="font-semibold text-gray-800 mb-1">{s.name}</p>
+                      <p className="text-[10px] leading-snug text-gray-500 mb-2">{s.description}</p>
+                      <a href={s.sourceUrl} target="_blank" className="text-[10px] text-blue-600 hover:underline block truncate max-w-[200px]">Source: {s.sourceText}</a>
+                    </td>
+                    <td className="p-3">
+                      {isComingSoon ? (
+                        <span className="text-gray-400 italic font-medium">Coming Soon</span>
+                      ) : (
+                        <div className="flex flex-col gap-3">
+                          {s.inputs.map(input => (
+                            <div key={input.key} className="flex flex-col gap-1">
+                              <div className="flex items-start gap-1">
+                                <label className="text-[10px] font-semibold text-gray-600 leading-tight flex-1">{input.label}</label>
+                                <div className="cursor-help inline-flex items-center justify-center w-3 h-3 rounded-full bg-gray-200 text-gray-600 text-[8px] font-bold"
+                                     onMouseEnter={(e) => handleMouseEnter(e, input.note)} onMouseLeave={handleMouseLeave}>i</div>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <input type="number" step="any" value={input.value} 
+                                       onChange={(e) => handleStrategyInput(s.id, input.key, Number(e.target.value))} 
+                                       disabled={as03LockedKeys.includes(input.key) && !unlockedFields[`${s.id}-${input.key}`]}
+                                       className={`border p-1.5 rounded w-20 text-black text-xs outline-none ${as03LockedKeys.includes(input.key) && !unlockedFields[`${s.id}-${input.key}`] ? 'bg-gray-200 cursor-not-allowed text-gray-500' : 'bg-white focus:ring-2 focus:ring-blue-500'}`} />
+                                <span className="text-[10px] text-gray-500 font-medium">{input.unitLabel}</span>
+                              </div>
+                              {as03LockedKeys.includes(input.key) && !unlockedFields[`${s.id}-${input.key}`] && (
+                                <button type="button" onClick={() => setUnlockedFields({...unlockedFields, [`${s.id}-${input.key}`]: true})} className="text-[9px] text-blue-600 underline text-left block">Edit manually</button>
+                              )}
+                              {as03LockedKeys.includes(input.key) && unlockedFields[`${s.id}-${input.key}`] && (
+                                <button type="button" onClick={() => {
+                                  const defaultVal = initialStrategies.find(st => st.id === s.id)?.inputs.find(i => i.key === input.key)?.value || 0;
+                                  handleStrategyInput(s.id, input.key, defaultVal);
+                                  setUnlockedFields(prev => { const next = { ...prev }; delete next[`${s.id}-${input.key}`]; return next; });
+                                }} className="text-[9px] text-blue-600 underline text-left block">Restore to default</button>
+                              )}
+                            </div>
+                          ))}
                         </div>
-                      ))}
-                    </div>
-                  </td>
-                  <td className="p-3 font-mono text-gray-700 font-medium">{results[index].cfmRemoved}</td>
-                  <td className="p-3 font-mono text-red-600 font-bold">{results[index].cReduced}</td>
-                  <td className="p-3 font-mono text-blue-700 font-bold">{results[index].projectedC}</td>
-                  <td className="p-3 font-mono text-green-700 font-bold">{results[index].projectedI}</td>
-                </tr>
-              ))}
+                      )}
+                    </td>
+                    <td className="p-3 font-mono text-gray-700 font-medium">{isComingSoon ? "---" : results[index].cfmRemoved}</td>
+                    <td className="p-3 font-mono text-red-600 font-bold">{isComingSoon ? "---" : results[index].cReduced}</td>
+                    <td className="p-3 font-mono text-blue-700 font-bold">{isComingSoon ? "---" : results[index].projectedC}</td>
+                    <td className="p-3 font-mono text-green-700 font-bold">{isComingSoon ? "---" : results[index].projectedI}</td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
