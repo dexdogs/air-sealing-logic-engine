@@ -10,13 +10,13 @@ const defaultAssumptions: ProjectAssumptions = {
 };
 
 const assumptionLabels: Record<keyof ProjectAssumptions, { label: string; note: string }> = {
-  unitConditionedVolume: { label: "Unit Conditioned Volume", note: "Conditioned volume per unit at Gilman" },
-  baselineUnitCompartmentalization: { label: "Baseline Unit Compartmentalization (ACH50)", note: "Starting unit compartmentalization" },
-  baselineC_CFM50: { label: "Baseline Unit Compartmentalization (CFM50)", note: "Starting unit compartmentalization in a different unit" },
-  targetC_ACH50: { label: "Target Unit Compartmentalization (ACH50)", note: "Design target for unit compartmentalization" },
-  baselineWholeBuildingInfiltration: { label: "Baseline Whole-Building Infiltration (ACH50)", note: "Starting whole-building infiltration" },
-  targetI_ACH50: { label: "Target Whole-Building Infiltration (ACH50)", note: "Design target for whole-building infiltration" },
-  ciRatio: { label: "Unit Compartmentalization : Whole-Building Infiltration Ratio", note: "I as fraction of C, derived from baseline values (building science assumes 50/50 but the assumption I have here is closer to reality)" },
+  unitConditionedVolume: { label: "Unit Conditioned Volume", note: "Conditioned volume per unit from L x W x H" },
+  baselineUnitCompartmentalization: { label: "Baseline Unit Compartmentalization (ACH50)", note: "Starting unit compartmentalization from HERS model or initial Blower Door test" },
+  baselineC_CFM50: { label: "Baseline Unit Compartmentalization (CFM50)", note: "Starting unit compartmentalization in CFM50" },
+  targetC_ACH50: { label: "Target Unit Compartmentalization (ACH50)", note: "Design target for unit compartmentalization from HERS model or code limit" },
+  baselineWholeBuildingInfiltration: { label: "Baseline Whole-Building Infiltration (ACH50)", note: "Starting whole-building infiltration or initial Blower Door test" },
+  targetI_ACH50: { label: "Target Whole-Building Infiltration (ACH50)", note: "Design target for whole-building infiltration from HERS model or code limit" },
+  ciRatio: { label: "Unit Compartmentalization : Whole-Building Infiltration Ratio", note: "Infiltration as fraction of Compartmentalization, derived from baseline values (building science assumes 50/50)" },
   airDensity: { label: "Air Density", note: "Standard air density at sea level (standard)" },
   dischargeCoefficient: { label: "Discharge Coefficient", note: "Default crack or orifice discharge coefficient (literature)" },
   cfm50PerSqInch: { label: "CFM50 per sq inch of Effective Leakage area", note: "1 sq inch Effective Leakage area = 18 CFM50 (this is a constant, widely used in US building science tools including LBNL's infiltration calculators literature. Sources: Sherman & Grimsrud (1980), ASHRAE Handbook of Fundamentals, Chapter 27, ASTM E779)" }
