@@ -154,25 +154,28 @@ export default function Home() {
   const [strategies, setStrategies] = useState<StrategyInput[]>(initialStrategies);
   const [showPanel, setShowPanel] = useState<boolean>(true);
   const [unlockedFields, setUnlockedFields] = useState<Record<string, boolean>>({});
+  const [pendingTargetI, setPendingTargetI] = useState<{value: number, newRatio: number} | null>(null);
   
   // Custom fixed tooltip state to prevent clipping
   const [tooltip, setTooltip] = useState<{show: boolean, text: string, x: number, y: number, isEquation?: boolean, eqName?: string}>({show: false, text: "", x: 0, y: 0});
   
   const handleAssumptionChange = (key: keyof ProjectAssumptions, value: number) => {
+    if (key === 'targetI_ACH50') {
+      const proposedRatio = value / assumptions.targetC_ACH50;
+      if (Math.abs(proposedRatio - assumptions.ciRatio) > 0.001) {
+        setPendingTargetI({ value, newRatio: proposedRatio });
+        return;
+      }
+    }
     let newAssumptions = { ...assumptions, [key]: value };
     if (key === 'baselineUnitCompartmentalization') newAssumptions.baselineC_CFM50 = Number(((value * newAssumptions.unitConditionedVolume) / 60).toFixed(2));
     else if (key === 'baselineC_CFM50') newAssumptions.baselineUnitCompartmentalization = Number(((value * 60) / newAssumptions.unitConditionedVolume).toFixed(3));
     else if (key === 'unitConditionedVolume') newAssumptions.baselineC_CFM50 = Number(((newAssumptions.baselineUnitCompartmentalization * value) / 60).toFixed(2));
+    else if (key === 'targetC_ACH50') newAssumptions.targetI_ACH50 = Number((value * newAssumptions.ciRatio).toFixed(2));
+    else if (key === 'ciRatio') newAssumptions.targetI_ACH50 = Number((newAssumptions.targetC_ACH50 * value).toFixed(2));
+    
     setAssumptions(newAssumptions);
-  };
-
-  const results = calculateImpact(assumptions, strategies);
-
-  const handleStrategyInput = (strategyId: string, inputKey: string, value: number) => {
-    setStrategies(strategies.map(s => {
-      if (s.id !== strategyId) return s;
-      return { ...s, inputs: s.inputs.map(i => i.key === inputKey ? { ...i, value } : i) };
-    }));
+    if (key !== 'targetI_ACH50') setPendingTargetI(null);
   };
 
   const handleMouseEnter = (e: React.MouseEvent, text: string, isEquation = false, eqName = "") => {
@@ -311,6 +314,6 @@ export default function Home() {
           </table>
         </div>
       </div>
-    <footer className="fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 text-center py-2 text-black text-xs z-[100] flex flex-col md:flex-row justify-center items-center gap-2 md:gap-4 shadow-lg"><span className="font-bold">Dexdogs Logic Engine</span><span>Solving the environmental data problem by standardizing field science. This tool is open for iterative feedback.</span><a href="mailto:ankur@dexdogs.earth" className="underline font-bold hover:text-gray-600">Send Feedback to ankur@dexdogs.earth</a></footer></main>
+    <footer className="fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 text-center py-2 text-black text-xs z-[100] flex flex-col md:flex-row justify-center items-center gap-2 md:gap-4 shadow-lg"><span className="font-bold">dexdogs // environment has a data problem</span><span>Solving the environmental data problem by standardizing field science. This tool is open for iterative feedback.</span><a href="mailto:ankur@dexdogs.earth" className="underline font-bold hover:text-gray-600">Send Feedback to ankur@dexdogs.earth</a></footer></main>
   );
 }
