@@ -170,6 +170,33 @@ export default function Home() {
     setAssumptions(newAssumptions);
   };
 
+  
+  const exportToCSV = () => {
+    let csvContent = "data:text/csv;charset=utf-8,";
+    
+    csvContent += "PROJECT KEY INPUTS\n";
+    csvContent += "Parameter,Value\n";
+    (Object.keys(assumptions) as Array<keyof ProjectAssumptions>).forEach(key => {
+      csvContent += `"${assumptionLabels[key].label}","${assumptions[key]}"\n`;
+    });
+    
+    csvContent += "\nSTRATEGIES AND RESULTS\n";
+    csvContent += "ID,Strategy Name,Type,Equation,Inputs,CFM50 Removed,% Leakage Reduced,Projected C (ACH50),Projected I (ACH50),Source\n";
+    strategies.forEach((s, index) => {
+      const res = results[index];
+      const inputsStr = s.inputs.map(i => `${i.label}: ${i.value} ${i.unitLabel}`).join(" | ");
+      csvContent += `"${s.id}","${s.name}","${s.type}","${s.equationName}: ${s.equationDesc}","${inputsStr}","${res.cfmRemoved}","${res.cReduced}","${res.projectedC}","${res.projectedI}","${s.sourceText} (${s.sourceUrl})"\n`;
+    });
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "Air_Sealing_Logic_Engine_Export.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   const handleMouseEnter = (e: React.MouseEvent, text: string, isEquation = false, eqName = "") => {
     setTooltip({ show: true, text, x: e.clientX, y: e.clientY, isEquation, eqName });
   };
@@ -248,8 +275,12 @@ export default function Home() {
 
       {/* Right Panel: Independently Scrollable Viewport */}
       <div className="flex-1 h-full overflow-y-auto bg-white p-6 md:p-8">
-        <div className="mb-8 max-w-[1400px]">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Air Sealing Logic Engine</h1>
+        <div className="mb-8 max-w-[1400px] flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+          <h1 className="text-3xl font-bold text-gray-900">Air Sealing Logic Engine</h1>
+          <button onClick={exportToCSV} className="bg-green-600 text-white px-4 py-2 rounded-md shadow-md hover:bg-green-700 transition-colors text-sm font-bold flex items-center gap-2 w-fit">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+            Export to CSV
+          </button>
         </div>
         
         <div className="overflow-x-auto pb-32 max-w-[1400px]">
