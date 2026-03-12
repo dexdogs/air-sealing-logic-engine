@@ -22,7 +22,7 @@ export interface StrategyInputField {
 export interface StrategyInput {
   id: string;
   name: string;
-  type: "Linear" | "Void" | "Stack" | "DuctBypass" | "RimJoist";
+  type: "Linear" | "Void" | "Stack" | "DuctBypass" | "RimJoist" | "OrificeArea";
   inputs: StrategyInputField[];
   equationName: string;
   equationDesc: string;
