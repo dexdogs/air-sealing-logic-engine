@@ -58,52 +58,52 @@ const initialStrategies: StrategyInput[] = [
     sourceText: "BSC: Sealing Penetrations", sourceUrl: "https://www1.eere.energy.gov/buildings/publications/pdfs/building_america/sealing_penetrations.pdf"
   },
   { 
-    id: "AS-04", name: "Stairwell drywall strip & sealant", type: "Linear",
+    id: "AS-04", name: "Stairwell drywall strip & sealant", type: "OrificeArea",
     inputs: [
       { key: "length", label: "Sealed perimeter in ft", value: 150, unitLabel: "ft", note: "Modeled number. Need actual measurements" },
       { key: "width", label: "gap width in inches", value: 0.125, unitLabel: "in", note: "Modeled number. Need actual measurements" }
     ],
-    equationName: "Linear Leakage", equationDesc: "(Perimeter in ft x 12) x (Gap width in inches) x (CFM50 per sq inch)",
+    equationName: "Orifice Area", equationDesc: "(Sealed perimeter in ft) x (gap width in inches) x (CFM50 per sq inch)",
     description: "Bridges the RC gap around unit boundaries.",
     sourceText: "DOE: Multifamily Separation Walls", sourceUrl: "https://www.energy.gov/cmei/buildings/articles/building-america-webinar-air-sealing-best-practices-and-code-compliance"
   },
   { 
-    id: "AS-05", name: "Seal accessible MEP penetrations", type: "Linear",
+    id: "AS-05", name: "Seal accessible MEP penetrations", type: "OrificeArea",
     inputs: [
       { key: "length", label: "sealed length around the MEP penetration in ft", value: 150, unitLabel: "ft", note: "Modeled number. Need actual measurements" },
-      { key: "width", label: "gap width in inches", value: 0.125, unitLabel: "in", note: "Modeled number. Need actual measurements" }
+      { key: "width", label: "gap width in inches", value: 0.1, unitLabel: "in", note: "Modeled number. Need actual measurements" }
     ],
-    equationName: "Linear Leakage", equationDesc: "(Perimeter length in ft x 12) x (Gap width in inches) x (CFM50 per sq inch)",
+    equationName: "Orifice Area", equationDesc: "Same as Orifice Area (AS-04) using length around penetration",
     description: "Air seal around all plumbing and piping installed through walls, ceilings, and flooring.",
     sourceText: "ES MFNC Field Checklist", sourceUrl: "https://www.energystar.gov/sites/default/files/asset/document/ENERGY%20STAR%20MFNC%20Rater%20Field%20Checklist%20Version%201_1.1_1.2_Rev04.pdf"
   },
   { 
-    id: "AS-06", name: "Tape all subfloor seams", type: "Linear",
+    id: "AS-06", name: "Tape all subfloor seams", type: "OrificeArea",
     inputs: [
       { key: "length", label: "sealed length around the MEP penetration in ft", value: 150, unitLabel: "ft", note: "Modeled number. Need actual measurements" },
       { key: "width", label: "gap width that is getting sealed", value: 0.069, unitLabel: "in", note: "I assumed 10 sq inch that's a roughly 3\" × 3.3\" opening" }
     ],
-    equationName: "Linear Leakage", equationDesc: "(Sealed length in ft x 12) x (Gap width in inches) x (CFM50 per sq inch)",
+    equationName: "Orifice Area", equationDesc: "(Sealed length in ft x 12) x (Gap width in inches) x (CFM50 per sq inch)",
     description: "We need to choose the primary pressure plane preventing air entry into floor cavities.",
     sourceText: "DOE: Air Seal Subfloor Penetrations", sourceUrl: "https://www.energy.gov/sites/default/files/2024-07/13-2_air-seal-large-penetrations-in-subfloor.pdf"
   },
   { 
-    id: "AS-07", name: "Seal Zip sheathing at bottom", type: "Linear",
+    id: "AS-07", name: "Seal Zip sheathing at bottom", type: "OrificeArea",
     inputs: [
       { key: "length", label: "Projected/Intervention sealed length", value: 10, unitLabel: "ft", note: "Modeled number. Need actual measurements" },
       { key: "width", label: "gap width that is getting sealed", value: 0.069, unitLabel: "in", note: "I assumed 10 sq inch that's a roughly 3\" × 3.3\" opening" }
     ],
-    equationName: "Linear Leakage", equationDesc: "Same as Linear Leakage",
+    equationName: "Orifice Area", equationDesc: "Same as Linear Leakage",
     description: "Required to connect Zip to foundation sleepers.",
     sourceText: "PHIUS basics", sourceUrl: "https://www.phius.org/passive-building/what-passive-building/passive-building-principles"
   },
   { 
-    id: "AS-08", name: "Sealant beads at sleepers", type: "Linear",
+    id: "AS-08", name: "Sealant beads at sleepers", type: "OrificeArea",
     inputs: [
       { key: "length", label: "Projected/Intervention sealed length", value: 5, unitLabel: "ft", note: "Modeled number. Need actual measurements" },
-      { key: "width", label: "gap width in inches", value: 0.125, unitLabel: "in", note: "Modeled number. Need actual measurements" }
+      { key: "width", label: "gap width in inches", value: 0.1, unitLabel: "in", note: "Modeled number. Need actual measurements" }
     ],
-    equationName: "Linear Leakage", equationDesc: "Same as Linear Leakage",
+    equationName: "Orifice Area", equationDesc: "Same as Linear Leakage",
     description: "Replaces structural gaps with high performance gasket seal during box set.",
     sourceText: "PNNL: Modular Marriage Joints", sourceUrl: "https://basc.pnnl.gov/resource-guides/air-sealing-modular-home-marriage-joints"
   },
@@ -128,9 +128,9 @@ const initialStrategies: StrategyInput[] = [
     sourceText: "PNNL: Sealing Drywall to Plate", sourceUrl: "https://basc.pnnl.gov/resource-guides/air-sealing-drywall-top-plate"
   },
   { 
-    id: "AS-11", name: "Air seal bottom plates", type: "Linear",
+    id: "AS-11", name: "Air seal bottom plates", type: "OrificeArea",
     inputs: [{ key: "length", label: "length to air seal in bottom plates", value: 10, unitLabel: "ft", note: "Modeled number. Need actual measurements" }],
-    equationName: "Linear Leakage", equationDesc: "Same as Linear Leakage",
+    equationName: "Orifice Area", equationDesc: "Same as Linear Leakage",
     description: "This should address baseboard-to-floor bypasses found during Gilman testing.",
     sourceText: "PNNL: Air Sealing Plumbing", sourceUrl: "https://basc.pnnl.gov/resource-guides/air-sealing-plumbing-and-piping"
   },
@@ -142,9 +142,9 @@ const initialStrategies: StrategyInput[] = [
     sourceText: "Siplast: Air Barrier Transitions", sourceUrl: "https://www.siplast.com/blog/building-enclosure/what-architects-should-know-about-air-barrier-transitions-281474980418303"
   },
   { 
-    id: "AS-13", name: "Seal beam before Zip", type: "Linear",
+    id: "AS-13", name: "Seal beam before Zip", type: "OrificeArea",
     inputs: [{ key: "length", label: "Projected/Intervention sealed length", value: 10, unitLabel: "ft", note: "Modeled number. Need actual measurements" }],
-    equationName: "Linear Leakage", equationDesc: "Same as Linear Leakage",
+    equationName: "Orifice Area", equationDesc: "Same as Linear Leakage",
     description: "Sealant bead isolates structural frame from exterior sheathing as per ASHRAE 90.1.",
     sourceText: "PNNL: Modular Marriage Joints", sourceUrl: "https://basc.pnnl.gov/resource-guides/air-sealing-modular-home-marriage-joints"
   }
