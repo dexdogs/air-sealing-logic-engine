@@ -232,7 +232,9 @@ export default function Home() {
                   </div>
                   <input type="number" step="any" value={assumptions[key]} onChange={(e) => handleAssumptionChange(key, Number(e.target.value))} disabled={lockedAssumptionKeys.includes(key) && !unlockedFields[key]} className={`w-full border p-2 rounded text-black text-sm outline-none ${lockedAssumptionKeys.includes(key) && !unlockedFields[key] ? 'bg-gray-200 cursor-not-allowed text-gray-500' : 'bg-white'}`} />
                   {lockedAssumptionKeys.includes(key) && !unlockedFields[key] && <button type="button" onClick={() => setUnlockedFields({...unlockedFields, [key]: true})} className="text-[10px] text-blue-600 underline mt-1 text-left">Edit manually</button>}
-                  {lockedAssumptionKeys.includes(key) && unlockedFields[key] && <p className="text-[10px] text-amber-600 mt-1 font-bold">⚠️ Default values from literature</p>}
+                  {lockedAssumptionKeys.includes(key) && unlockedFields[key] && (
+                    <button type="button" onClick={() => { setAssumptions({...assumptions, [key]: defaultAssumptions[key]}); setUnlockedFields({...unlockedFields, [key]: false}); }} className="text-[10px] text-blue-600 underline mt-1 text-left hover:text-blue-800 block">Restore to default</button>
+                  )}
                 </div>
               );
             })}
