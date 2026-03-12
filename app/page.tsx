@@ -271,7 +271,7 @@ export default function Home() {
             </thead>
             <tbody>
               {strategies.map((s, index) => {
-                const isComingSoon = ['AS-11', 'AS-13'].includes(s.id);
+                const isComingSoon = ["AS-07", "AS-08", "AS-11", "AS-13"].includes(s.id);
                 return (
                   <tr key={s.id} className="border-b hover:bg-gray-50 align-top transition-colors">
                     <td className="p-3">
@@ -279,7 +279,7 @@ export default function Home() {
                         <span className="font-bold text-gray-900">{s.id}</span>
                         {!isComingSoon && (
                           <div className="cursor-help inline-flex items-center justify-center w-5 h-5 rounded-full bg-blue-100 text-blue-600 text-xs font-bold"
-                               !["AS-07", "AS-08", "AS-11", "AS-13"].includes(s.id) && onMouseEnter={(e) => handleMouseEnter(e, s.equationDesc, true, s.equationName)} onMouseLeave={handleMouseLeave}>i</div>
+                               onMouseEnter={(e) => handleMouseEnter(e, s.equationDesc, true, s.equationName)} onMouseLeave={handleMouseLeave}>i</div>
                         )}
                       </div>
                       <p className="font-semibold text-gray-800 mb-1">{s.name}</p>
