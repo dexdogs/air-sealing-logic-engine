@@ -1,36 +1,30 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Air Sealing Logic Engine
 
-## Getting Started
+### About
+A modular modeling engine designed to quantify the impact of specific air sealing strategies on Unit Compartmentalization ($ACH_{50}$) and Whole-Building Infiltration.
 
-First, run the development server:
+### Who is this for?
+Built for **Dexdogs** to empower building scientists, modular manufacturers, and HERS raters to transition from anecdotal field measurements to verifiable, data-driven projections.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+### Why is this important?
+This tool standardizes inconsistent field observations. By applying verified physics equations to observable defects, it allows teams to prioritize high-ROI interventions for building performance.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Equations Used
+1. **Linear Leakage**: $CFM_{50} = (L_{ft} \times 12) \times W_{in} \times 18$
+2. **Void Fraction / Rim Joist**: $CFM_{50} = \text{Baseline}_{CFM50} \times \text{Fraction}$
+3. **Stack Effect**: $CFM_{50} = C_d \times A_{ft^2} \times \sqrt{\frac{2g \cdot h \cdot \Delta T}{T_{avg}}} \times 60 \times 20$
+4. **Duct Bypass**: $CFM_{50} = \text{Boots} \times A_{in^2} \times 18$
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Literature & Sources
+- [PNNL: Sealing Sill Plates](https://basc.pnnl.gov/resource-guides/air-sealing-sill-plates)
+- [BSC: Sealing the Right Walls](https://buildingscience.com/documents/building-science-insights-newsletters/bsi-108-are-we-sealing-right-walls-buildings)
+- [EERE: Sealing Penetrations](https://www1.eere.energy.gov/buildings/publications/pdfs/building_america/sealing_penetrations.pdf)
+- [DOE: MF Air Sealing](https://www.energy.gov/cmei/buildings/articles/building-america-webinar-air-sealing-best-practices-and-code-compliance)
+- [Energy Star: Rater Checklist](https://www.energystar.gov/sites/default/files/asset/document/ENERGY%20STAR%20MFNC%20Rater%20Field%20Checklist%20Version%201_1.1_1.2_Rev04.pdf)
+- [DOE: Subfloor Sealing](https://www.energy.gov/sites/default/files/2024-07/13-2_air-seal-large-penetrations-in-subfloor.pdf)
+- [PHIUS: Passive Principles](https://www.phius.org/passive-building/what-passive-building/passive-building-principles)
+- [PNNL: Marriage Joints](https://basc.pnnl.gov/resource-guides/air-sealing-modular-home-marriage-joints)
+- [BSC: Air Barriers](https://buildingscience.com/sites/default/files/migrate/pdf/RR-0403_Air_barriers_BFG.pdf)
+- [PNNL: Drywall Sealing](https://basc.pnnl.gov/resource-guides/air-sealing-drywall-top-plate)
+- [PNNL: Plumbing Sealing](https://basc.pnnl.gov/resource-guides/air-sealing-plumbing-and-piping)
+- [Siplast: Barrier Transitions](https://www.siplast.com/blog/building-enclosure/what-architects-should-know-about-air-barrier-transitions-281474980418303)

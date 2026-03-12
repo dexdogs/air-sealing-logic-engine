@@ -304,6 +304,6 @@ export default function Home() {
           </table>
         </div>
       </div>
-    <footer className="mt-12 pt-8 border-t border-gray-200 text-center pb-12 text-black text-xs"><div className="max-w-md mx-auto px-4"><p className="font-bold mb-1">Dexdogs Logic Engine</p><p className="mb-2">Solving the environmental data problem by standardizing field science. This tool is open for iterative feedback.</p><a href="mailto:ankur@dexdogs.earth" className="underline font-bold hover:opacity-75">Send Feedback to ankur@dexdogs.earth</a></div></footer></main>
+    <footer className="fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 text-center py-2 text-black text-xs z-[100] flex flex-col md:flex-row justify-center items-center gap-2 md:gap-4 shadow-lg"><span className="font-bold">Dexdogs Logic Engine</span><span>Solving the environmental data problem by standardizing field science. This tool is open for iterative feedback.</span><a href="mailto:ankur@dexdogs.earth" className="underline font-bold hover:text-gray-600">Send Feedback to ankur@dexdogs.earth</a></footer></main>
   );
 }
