@@ -2,7 +2,7 @@ import { ProjectAssumptions, StrategyInput } from "../types";
 
 export function calculateImpact(assumptions: ProjectAssumptions, strategies: StrategyInput[]) {
   const baselineCFM50 = (assumptions.baselineUnitCompartmentalization * assumptions.unitConditionedVolume) / 60;
-  const ciRatio = assumptions.baselineWholeBuildingInfiltration / assumptions.baselineUnitCompartmentalization;
+  const ciRatio = assumptions.ciRatio;
   
   const getVal = (strategy: StrategyInput, key: string) => strategy.inputs.find(i => i.key === key)?.value || 0;
 
