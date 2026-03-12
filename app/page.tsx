@@ -22,7 +22,7 @@ const assumptionLabels: Record<keyof ProjectAssumptions, { label: string; note: 
   cfm50PerSqInch: { label: "CFM50 per sq inch of Effective Leakage area", note: "1 sq inch Effective Leakage area = 18 CFM50 (this is a constant, widely used in US building science tools including LBNL's infiltration calculators literature. Sources: Sherman & Grimsrud (1980), ASHRAE Handbook of Fundamentals, Chapter 27, ASTM E779)" }
 };
 
-const lockedAssumptionKeys = ['ciRatio', 'airDensity', 'dischargeCoefficient', 'cfm50PerSqInch'];
+const lockedAssumptionKeys = ['targetI_ACH50', 'ciRatio', 'airDensity', 'dischargeCoefficient', 'cfm50PerSqInch'];
 
 const initialStrategies: StrategyInput[] = [
   { 
@@ -154,28 +154,20 @@ export default function Home() {
   const [strategies, setStrategies] = useState<StrategyInput[]>(initialStrategies);
   const [showPanel, setShowPanel] = useState<boolean>(true);
   const [unlockedFields, setUnlockedFields] = useState<Record<string, boolean>>({});
-  const [pendingTargetI, setPendingTargetI] = useState<{value: number, newRatio: number} | null>(null);
-  
+    
   // Custom fixed tooltip state to prevent clipping
   const [tooltip, setTooltip] = useState<{show: boolean, text: string, x: number, y: number, isEquation?: boolean, eqName?: string}>({show: false, text: "", x: 0, y: 0});
   
   const handleAssumptionChange = (key: keyof ProjectAssumptions, value: number) => {
-    if (key === 'targetI_ACH50') {
-      const proposedRatio = value / assumptions.targetC_ACH50;
-      if (Math.abs(proposedRatio - assumptions.ciRatio) > 0.001) {
-        setPendingTargetI({ value, newRatio: proposedRatio });
-        return;
-      }
-    }
     let newAssumptions = { ...assumptions, [key]: value };
     if (key === 'baselineUnitCompartmentalization') newAssumptions.baselineC_CFM50 = Number(((value * newAssumptions.unitConditionedVolume) / 60).toFixed(2));
     else if (key === 'baselineC_CFM50') newAssumptions.baselineUnitCompartmentalization = Number(((value * 60) / newAssumptions.unitConditionedVolume).toFixed(3));
     else if (key === 'unitConditionedVolume') newAssumptions.baselineC_CFM50 = Number(((newAssumptions.baselineUnitCompartmentalization * value) / 60).toFixed(2));
     else if (key === 'targetC_ACH50') newAssumptions.targetI_ACH50 = Number((value * newAssumptions.ciRatio).toFixed(2));
     else if (key === 'ciRatio') newAssumptions.targetI_ACH50 = Number((newAssumptions.targetC_ACH50 * value).toFixed(2));
+    else if (key === 'targetI_ACH50') newAssumptions.ciRatio = Number((value / newAssumptions.targetC_ACH50).toFixed(4));
     
     setAssumptions(newAssumptions);
-    if (key !== 'targetI_ACH50') setPendingTargetI(null);
   };
 
   const handleMouseEnter = (e: React.MouseEvent, text: string, isEquation = false, eqName = "") => {
@@ -230,12 +222,24 @@ export default function Home() {
                       i
                     </div>
                   </div>
-                  <input type="number" step="any" value={assumptions[key]} onChange={(e) => handleAssumptionChange(key, Number(e.target.value))} disabled={lockedAssumptionKeys.includes(key) && !unlockedFields[key]} className={`w-full border p-2 rounded text-black text-sm outline-none ${lockedAssumptionKeys.includes(key) && !unlockedFields[key] ? 'bg-gray-200 cursor-not-allowed text-gray-500' : 'bg-white'}`} />
-                  {lockedAssumptionKeys.includes(key) && !unlockedFields[key] && <button type="button" onClick={() => setUnlockedFields({...unlockedFields, [key]: true})} className="text-[10px] text-blue-600 underline mt-1 text-left">Edit manually</button>}
-                  {lockedAssumptionKeys.includes(key) && unlockedFields[key] && (
-                    <button type="button" onClick={() => { setAssumptions({...assumptions, [key]: defaultAssumptions[key]}); setUnlockedFields({...unlockedFields, [key]: false}); }} className="text-[10px] text-blue-600 underline mt-1 text-left hover:text-blue-800 block">Restore to default</button>
+                  <input type="number" step="any" value={assumptions[key]} onChange={(e) => handleAssumptionChange(key, Number(e.target.value))} disabled={lockedAssumptionKeys.includes(key) && !unlockedFields[key]} className={`w-full border p-2 rounded text-black text-sm outline-none ${lockedAssumptionKeys.includes(key) && !unlockedFields[key] ? 'bg-gray-200 cursor-not-allowed text-gray-500' : 'bg-white focus:ring-2 focus:ring-blue-500'}`} />
+                  {lockedAssumptionKeys.includes(key) && !unlockedFields[key] && (
+                    <button type="button" onClick={() => setUnlockedFields({...unlockedFields, [key]: true})} className="text-[10px] text-blue-600 underline mt-1 text-left hover:text-blue-800 block">Edit manually</button>
                   )}
-                </div>
+                  {lockedAssumptionKeys.includes(key) && unlockedFields[key] && (
+                    <div className="mt-1">
+                      {key === 'targetI_ACH50' && <p className="text-[10px] text-amber-600 font-bold mb-1">⚠️ First change C:I ratio</p>}
+                      <button type="button" onClick={() => { 
+                        let defaultVal = defaultAssumptions[key];
+                        let newCi = key === 'targetI_ACH50' ? Number((defaultVal / assumptions.targetC_ACH50).toFixed(4)) : assumptions.ciRatio;
+                        setAssumptions({...assumptions, [key]: defaultVal, ciRatio: newCi}); 
+                        setUnlockedFields({...unlockedFields, [key]: false}); 
+                      }} className="text-[10px] text-blue-600 underline text-left hover:text-blue-800 block">
+                        Restore to default
+                      </button>
+                    </div>
+                  )}
+                  </div>
               );
             })}
           </div>
